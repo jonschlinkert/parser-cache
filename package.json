@@ -1,0 +1,49 @@
+{
+  "name": "parser-cache",
+  "description": "Cache and load parsers, sort of like consolidate engines.",
+  "version": "0.1.2",
+  "homepage": "https://github.com/jonschlinkert/parser-cache",
+  "author": {
+    "name": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/jonschlinkert/parser-cache.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jonschlinkert/parser-cache/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/jonschlinkert/parser-cache/blob/master/LICENSE-MIT"
+    }
+  ],
+  "keywords": [
+    "parse",
+    "parser",
+    "cache",
+    "engine",
+    "parsers"
+  ],
+  "main": "index.js",
+  "parsers": {
+    "node": ">=0.10.0"
+  },
+  "scripts": {
+    "test": "mocha -R spec"
+  },
+  "devDependencies": {
+    "mocha": "*",
+    "should": "^4.0.4",
+    "verb": ">= 0.2.6",
+    "verb-tag-jscomments": ">= 0.1.4"
+  },
+  "dependencies": {
+    "debug": "^1.0.4",
+    "engine-utils": "^0.1.0",
+    "gray-matter": "^0.4.2",
+    "lodash": "^2.4.1"
+  }
+}
