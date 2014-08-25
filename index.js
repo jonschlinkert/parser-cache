@@ -7,7 +7,7 @@ var debug = require('debug')('parser-cache');
 
 /**
  * ```js
- * var parsers = require('parser-cache')
+ * var parsers = require('parser-cache');
  * ```
  *
  * @method `parsers`
@@ -62,7 +62,7 @@ parsers.init = function(opts) {
 
 parsers.defaultParsers = function() {
   debug('defaultParsers', arguments);
-  this.register('matter', require('./lib/parsers/matter'));
+  this.register('matter', require('parser-matter'));
   this.register('*', require('./lib/parsers/noop'));
 };
 
@@ -104,7 +104,7 @@ parsers.register = function (ext, options, fn) {
     parser.parse = fn.parse;
   } else if (typeof fn === 'object') {
     parser = fn || this.noop;
-    parser.parseFile = fn.parseFile || fn.__express;
+    parser.parseFile = fn.parseFile;
   }
 
   parser.options = fn.options || options || {};
@@ -120,33 +120,6 @@ parsers.register = function (ext, options, fn) {
   debug('[registered] %s: %j', ext, parser);
 
   this.cache[ext] = parser;
-  return this;
-};
-
-
-/**
- * Load an object of parsers onto the `cache`.
- * Mostly useful for testing, but exposed as
- * a public method.
- *
- * ```js
- * parsers.load(require('consolidate'))
- * ```
- *
- * @param  {Object} `obj` Parsers to load.
- * @return {parsers} to enable chaining.
- * @api public
- */
-
-parsers.load = function(obj) {
-  debug('[load]', arguments);
-
-  _.forIn(obj, function (value, key) {
-    if (value.hasOwnProperty('parse')) {
-      this.register(key, value);
-    }
-  }, this);
-
   return this;
 };
 

@@ -9,7 +9,7 @@
 
 var should = require('should');
 var matter = require('gray-matter');
-var utils = require('../lib/utils');
+var utils = require('parser-utils');
 var _ = require('lodash');
 
 
