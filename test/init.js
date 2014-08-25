@@ -8,7 +8,8 @@
 'use strict';
 
 var should = require('should');
-var parsers = require('..');
+var Parsers = require('..');
+var parsers = new Parsers();
 
 
 describe('parsers init', function() {

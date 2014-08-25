@@ -9,7 +9,9 @@
 
 var assert = require('assert');
 var should = require('should');
-var parsers = require('..');
+var Parsers = require('..');
+var parsers = new Parsers();
+
 
 describe('parsers register', function() {
   beforeEach(function() {

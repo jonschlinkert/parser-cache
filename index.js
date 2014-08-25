@@ -15,28 +15,9 @@ var debug = require('debug')('parser-cache');
  * @api public
  */
 
-function parsers (options) {
-  parsers.init(options);
-  return parsers;
+function Parsers (options) {
+  this.init(options);
 }
-
-
-/**
- * Options cache
- *
- * @type {Object}
- */
-
-parsers.options = {};
-
-
-/**
- * Parser cache
- *
- * @type {Object}
- */
-
-parsers.cache = {};
 
 
 /**
@@ -45,7 +26,7 @@ parsers.cache = {};
  * @api private
  */
 
-parsers.init = function(opts) {
+Parsers.prototype.init = function(opts) {
   debug('init', arguments);
   this.options = {};
   this.cache = {};
@@ -60,7 +41,7 @@ parsers.init = function(opts) {
  * @api private
  */
 
-parsers.defaultParsers = function() {
+Parsers.prototype.defaultParsers = function() {
   debug('defaultParsers', arguments);
   this.register('matter', require('parser-matter'));
   this.register('*', require('./lib/parsers/noop'));
@@ -71,8 +52,8 @@ parsers.defaultParsers = function() {
  * Register the given view parser callback `fn` as `ext`.
  *
  * ```js
- * var consolidate = require('consolidate')
- * parsers.register('hbs', consolidate.handlebars)
+ * var parser = require('parsnip');
+ * parsers.register('hbs', parser.markdown);
  * ```
  *
  * @param {String} `ext`
@@ -82,7 +63,7 @@ parsers.defaultParsers = function() {
  * @api public
  */
 
-parsers.register = function (ext, options, fn) {
+Parsers.prototype.register = function (ext, options, fn) {
   var args = [].slice.call(arguments);
 
   debug('[register]', arguments);
@@ -141,7 +122,7 @@ parsers.register = function (ext, options, fn) {
  * @api public
  */
 
-parsers.get = function(ext) {
+Parsers.prototype.get = function(ext) {
   if (!ext) {
     return this.cache;
   }
@@ -174,7 +155,7 @@ parsers.get = function(ext) {
  * @api public
  */
 
-parsers.clear = function(ext) {
+Parsers.prototype.clear = function(ext) {
   if (ext) {
     if (ext[0] !== '.') {
       ext = '.' + ext;
@@ -202,7 +183,7 @@ parsers.clear = function(ext) {
  * @api public
  */
 
-parsers.option = function(key, value) {
+Parsers.prototype.option = function(key, value) {
   var args = [].slice.call(arguments);
 
   if (args.length === 1 && typeof key === 'string') {
@@ -234,10 +215,10 @@ parsers.option = function(key, value) {
  * @api public
  */
 
-parsers.extend = function(obj) {
+Parsers.prototype.extend = function(obj) {
   this.options = _.extend({}, this.options, obj);
   return this;
 };
 
 
-module.exports = parsers;
+module.exports = Parsers;
