@@ -7,7 +7,8 @@ var debug = require('debug')('parser-cache');
 
 /**
  * ```js
- * var parsers = require('parser-cache');
+ * var Parsers = require('parser-cache');
+ * var parsers = new Parsers();
  * ```
  *
  * @method `parsers`
@@ -16,20 +17,20 @@ var debug = require('debug')('parser-cache');
  */
 
 function Parsers (options) {
+  this.options = {};
+  this.cache = {};
   this.init(options);
 }
 
 
 /**
- * Initialize defaults.
+ * Initialize default configuration.
  *
  * @api private
  */
 
 Parsers.prototype.init = function(opts) {
   debug('init', arguments);
-  this.options = {};
-  this.cache = {};
   this.defaultParsers();
   this.extend(opts);
 };
@@ -49,7 +50,7 @@ Parsers.prototype.defaultParsers = function() {
 
 
 /**
- * Register the given view parser callback `fn` as `ext`.
+ * Register the given parser callback `fn` as `ext`.
  *
  * ```js
  * var parser = require('parsnip');
