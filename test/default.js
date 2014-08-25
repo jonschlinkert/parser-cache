@@ -8,7 +8,9 @@
 'use strict';
 
 var should = require('should');
-var parsers = require('..');
+var Parsers = require('..');
+var parsers = new Parsers();
+var _ = require('lodash');
 
 describe('parsers defaults', function () {
   before(function () {
@@ -32,9 +34,31 @@ describe('parsers defaults', function () {
       });
     });
 
+    it('should parse content with the default parser.', function (done) {
+      var matter = parsers.get('matter');
+
+      matter.parse('---\ntitle: ABC\n---\n', function(err, file) {
+        if (err) console.log(err);
+
+        file.should.eql({
+          data: {title: 'ABC'},
+          original: '---\ntitle: ABC\n---\n',
+          content: '\n',
+          options: {}
+        });
+
+        done();
+      });
+    });
+
     it('should parse content with the default parser.', function () {
       var noop = parsers.get('*');
-      noop.parseSync('foo').should.equal('foo');
+      noop.parseSync('foo').should.eql({
+        data: {},
+        original: 'foo',
+        content: 'foo',
+        options: {}
+      });
     });
 
     it('should parse content with the default parser.', function () {
@@ -46,9 +70,12 @@ describe('parsers defaults', function () {
 
     it('should parse content over multiple passes.', function () {
       var matter = parsers.get('matter');
+      var noop = parsers.get('*');
+
       var a = matter.parseSync('abc', {data: {x: 'x'}});
-      var b = matter.parseSync(a, {locals: {y: 'y'}});
+      var b = noop.parseSync(a, {locals: {y: 'y'}});
       var c = matter.parseSync(b, {locals: {z: 'z'}});
+
 
       a.content.should.equal('abc');
       a.data.should.eql({x: 'x'});
@@ -58,6 +85,13 @@ describe('parsers defaults', function () {
 
       c.content.should.equal('abc');
       c.data.should.eql({x: 'x', y: 'y', z: 'z'});
+
+      var _c = _.clone(c);
+      _c.content = '---\ntitle: ABC\n---\n' + _c.content;
+      var d = matter.parseSync(_c);
+
+      d.content.should.equal('\nabc');
+      d.data.should.eql({x: 'x', y: 'y', z: 'z', title: 'ABC'});
     });
   });
 });

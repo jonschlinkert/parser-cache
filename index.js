@@ -7,48 +7,29 @@ var debug = require('debug')('parser-cache');
 
 /**
  * ```js
- * var parsers = require('parser-cache');
+ * var Parsers = require('parser-cache');
+ * var parsers = new Parsers();
  * ```
  *
- * @method `parsers`
  * @param {Object} `options` Default options to use.
  * @api public
  */
 
-function parsers (options) {
-  parsers.init(options);
-  return parsers;
+function Parsers (options) {
+  this.parsers = {};
+  this.options = {};
+  this.init(options);
 }
 
 
 /**
- * Options cache
- *
- * @type {Object}
- */
-
-parsers.options = {};
-
-
-/**
- * Parser cache
- *
- * @type {Object}
- */
-
-parsers.cache = {};
-
-
-/**
- * Initialize defaults.
+ * Initialize default configuration.
  *
  * @api private
  */
 
-parsers.init = function(opts) {
+Parsers.prototype.init = function(opts) {
   debug('init', arguments);
-  this.options = {};
-  this.cache = {};
   this.defaultParsers();
   this.extend(opts);
 };
@@ -60,19 +41,19 @@ parsers.init = function(opts) {
  * @api private
  */
 
-parsers.defaultParsers = function() {
+Parsers.prototype.defaultParsers = function() {
   debug('defaultParsers', arguments);
   this.register('matter', require('parser-matter'));
-  this.register('*', require('./lib/parsers/noop'));
+  this.register('*', require('parser-noop'));
 };
 
 
 /**
- * Register the given view parser callback `fn` as `ext`.
+ * Register the given parser callback `fn` as `ext`.
  *
  * ```js
- * var consolidate = require('consolidate')
- * parsers.register('hbs', consolidate.handlebars)
+ * var parser = require('parsnip');
+ * parsers.register('hbs', parser.markdown);
  * ```
  *
  * @param {String} `ext`
@@ -82,7 +63,7 @@ parsers.defaultParsers = function() {
  * @api public
  */
 
-parsers.register = function (ext, options, fn) {
+Parsers.prototype.register = function (ext, options, fn) {
   var args = [].slice.call(arguments);
 
   debug('[register]', arguments);
@@ -119,14 +100,14 @@ parsers.register = function (ext, options, fn) {
 
   debug('[registered] %s: %j', ext, parser);
 
-  this.cache[ext] = parser;
+  this.parsers[ext] = parser;
   return this;
 };
 
 
 /**
  * Return the parser stored by `ext`. If no `ext`
- * is passed, the entire cache is returned.
+ * is passed, the entire parsers is returned.
  *
  * ```js
  * var consolidate = require('consolidate')
@@ -141,9 +122,9 @@ parsers.register = function (ext, options, fn) {
  * @api public
  */
 
-parsers.get = function(ext) {
+Parsers.prototype.get = function(ext) {
   if (!ext) {
-    return this.cache;
+    return this.parsers;
   }
 
   ext = ext || this.noop;
@@ -151,17 +132,17 @@ parsers.get = function(ext) {
     ext = '.' + ext;
   }
 
-  var parser = this.cache[ext];
+  var parser = this.parsers[ext];
   if (!parser) {
-    parser = this.cache['*'];
+    parser = this.parsers['*'];
   }
   return parser;
 };
 
 
 /**
- * Remove `ext` from the cache, or if no value is
- * specified the entire cache is reset.
+ * Remove `ext` from the parsers, or if no value is
+ * specified the entire parsers is reset.
  *
  * **Example:**
  *
@@ -174,14 +155,14 @@ parsers.get = function(ext) {
  * @api public
  */
 
-parsers.clear = function(ext) {
+Parsers.prototype.clear = function(ext) {
   if (ext) {
     if (ext[0] !== '.') {
       ext = '.' + ext;
     }
-    delete this.cache[ext];
+    delete this.parsers[ext];
   } else {
-    this.cache = {};
+    this.parsers = {};
   }
 };
 
@@ -202,7 +183,7 @@ parsers.clear = function(ext) {
  * @api public
  */
 
-parsers.option = function(key, value) {
+Parsers.prototype.option = function(key, value) {
   var args = [].slice.call(arguments);
 
   if (args.length === 1 && typeof key === 'string') {
@@ -234,10 +215,10 @@ parsers.option = function(key, value) {
  * @api public
  */
 
-parsers.extend = function(obj) {
+Parsers.prototype.extend = function(obj) {
   this.options = _.extend({}, this.options, obj);
   return this;
 };
 
 
-module.exports = parsers;
+module.exports = Parsers;

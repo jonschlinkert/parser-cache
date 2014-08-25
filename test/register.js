@@ -9,7 +9,9 @@
 
 var assert = require('assert');
 var should = require('should');
-var parsers = require('..');
+var Parsers = require('..');
+var parsers = new Parsers();
+
 
 describe('parsers register', function() {
   beforeEach(function() {
@@ -17,7 +19,7 @@ describe('parsers register', function() {
   });
 
   describe('.register()', function() {
-    it('should register parsers to the `cache` object.', function() {
+    it('should register parsers to the `parsers` object.', function() {
       parsers.register('a', {
         parse: function () {}
       });
@@ -31,11 +33,11 @@ describe('parsers register', function() {
         parse: function () {}
       });
 
-      parsers.cache.should.have.property('.a');
-      parsers.cache.should.have.property('.b');
-      parsers.cache.should.have.property('.c');
-      parsers.cache.should.have.property('.d');
-      Object.keys(parsers.cache).length.should.equal(4);
+      parsers.parsers.should.have.property('.a');
+      parsers.parsers.should.have.property('.b');
+      parsers.parsers.should.have.property('.c');
+      parsers.parsers.should.have.property('.d');
+      Object.keys(parsers.parsers).length.should.equal(4);
     });
 
     it('should normalize parser extensions to not have a dot.', function() {
@@ -52,11 +54,11 @@ describe('parsers register', function() {
         parse: function () {}
       });
 
-      parsers.cache.should.have.property('.a');
-      parsers.cache.should.have.property('.b');
-      parsers.cache.should.have.property('.c');
-      parsers.cache.should.have.property('.d');
-      Object.keys(parsers.cache).length.should.equal(4);
+      parsers.parsers.should.have.property('.a');
+      parsers.parsers.should.have.property('.b');
+      parsers.parsers.should.have.property('.c');
+      parsers.parsers.should.have.property('.d');
+      Object.keys(parsers.parsers).length.should.equal(4);
     });
 
     it('should be chainable.', function() {
@@ -79,11 +81,11 @@ describe('parsers register', function() {
       assert.equal(typeof a, 'object');
       assert.equal(typeof a.parse, 'function');
 
-      parsers.cache.should.have.property('.a');
-      parsers.cache.should.have.property('.b');
-      parsers.cache.should.have.property('.c');
-      parsers.cache.should.have.property('.d');
-      Object.keys(parsers.cache).length.should.equal(4);
+      parsers.parsers.should.have.property('.a');
+      parsers.parsers.should.have.property('.b');
+      parsers.parsers.should.have.property('.c');
+      parsers.parsers.should.have.property('.d');
+      Object.keys(parsers.parsers).length.should.equal(4);
     });
   });
 });
