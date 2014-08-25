@@ -55,7 +55,10 @@
     "verb-tag-jscomments": "^0.2.0"
   },
   "dependencies": {
+    "arrayify-compact": "^0.1.0",
+    "chalk": "^0.5.1",
     "debug": "^1.0.4",
+    "globby": "^0.1.1",
     "gray-matter": "^0.4.2",
     "lodash": "^2.4.1",
     "parser-front-matter": "^0.1.0",

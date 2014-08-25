@@ -38,7 +38,6 @@ describe('parsers register', function() {
       parsers.parsers.should.have.property('.d');
       Object.keys(parsers.parsers).length.should.equal(4);
 
-
       parsers.clear('a');
       parsers.parsers.should.not.have.property('.a');
       parsers.parsers.should.have.property('.b');

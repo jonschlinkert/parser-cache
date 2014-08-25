@@ -2,7 +2,13 @@
 
 
 var _ = require('lodash');
+var path = require('path');
 var debug = require('debug')('parser-cache');
+var arrayify = require('arrayify-compact');
+var utils = require('parser-utils');
+var glob = require('globby');
+var chalk = require('chalk');
+var extend = _.extend;
 
 
 /**
@@ -43,7 +49,7 @@ Parsers.prototype.init = function(opts) {
 
 Parsers.prototype.defaultParsers = function() {
   debug('defaultParsers', arguments);
-  this.register('matter', require('parser-front-matter'));
+  this.register('md', require('parser-front-matter'));
   this.register('*', require('parser-noop'));
 };
 
@@ -63,44 +69,117 @@ Parsers.prototype.defaultParsers = function() {
  * @api public
  */
 
-Parsers.prototype.register = function (ext, options, fn) {
+Parsers.prototype.register = function (ext, fn) {
   var args = [].slice.call(arguments);
 
   debug('[register]', arguments);
+
   var parser = {};
 
-  if (args.length === 3 && typeof options === 'function') {
-    var opts = fn;
-    fn = options;
-    options = opts;
-  }
-
-  if (args.length === 2) {
-    fn = options;
-    options = {};
-  }
-
-  if (typeof fn === 'function') {
+  if (_.isFunction(fn)) {
+    parser.parse = fn;
+  } else if (_.isObject(fn)) {
+    if (typeof fn.parse !== 'function') {
+      throw new Error('Parsers are expected to have a `parse` method.');
+    }
     parser = fn;
-    parser.parse = fn.parse;
-  } else if (typeof fn === 'object') {
-    parser = fn || this.noop;
-    parser.parseFile = fn.parseFile;
-  }
-
-  parser.options = fn.options || options || {};
-
-  if (typeof parser.parse !== 'function') {
-    throw new Error('Parsers are expected to have a `parse` method.');
   }
 
   if (ext[0] !== '.') {
     ext = '.' + ext;
   }
 
-  debug('[registered] %s: %j', ext, parser);
+  var parsers = this.get(ext) || [];
 
-  this.parsers[ext] = parser;
+  this.parsers[ext] = _.union([], parsers, arrayify(parser));
+  return this;
+};
+
+
+/**
+ * Run a file through a parser stack.
+ *
+ * @param  {Object} `file`
+ * @param  {Object} `opts`
+ * @return {Object}
+ */
+
+Parsers.prototype.runParsers = function (file, parsers, opts) {
+  file = utils.extendFile(file, opts);
+
+  var ext = file.ext || opts.ext || path.extname(file.path);
+  if (ext[0] === '.') {
+    ext = ext.replace(/^\./, '');
+  }
+
+  parsers = parsers || this.get(ext);
+
+  if (parsers && parsers.length) {
+    parsers.forEach(function (parser) {
+      try {
+        file = parser.call(this, file, opts.encoding, opts);
+      } catch (err) {
+        throw new Error('#template:parser', err);
+      }
+    }.bind(this));
+  }
+};
+// Parsers.prototype._register = function (ext, fn) {
+//   debug('parser: %s', chalk.magenta(ext));
+
+//   if (ext[0] === '.') {
+//     ext = ext.replace(/^\./, '');
+//   }
+
+//   var parsers = this.parsers[ext] || [];
+//   var self = this;
+
+//   fn = arrayify(fn).map(function (parser) {
+//     if (typeof parser !== 'function') {
+//       throw new TypeError('parsers.parser() exception', ext);
+//     }
+//     return _.bind(parser, self);
+//   }.bind(this));
+
+//   this.parsers[ext] = _.union([], parsers, fn);
+//   return this;
+// };
+
+
+/**
+ * Register an array or glob of parsers for the given `ext`.
+ *
+ * **Example:**
+ *
+ * ```js
+ * parsers.registerGlob('hbs', 'a.js');
+ * // or
+ * parsers.registerGlob('md' ['a.js', 'b.js']);
+ * // or
+ * parsers.registerGlob('md', '*.js');
+ * ```
+ *
+ * @param  {String} `ext` The extension to associate with the parsers.
+ * @param  {String|Array} `patterns` File paths or glob patterns.
+ * @return {Object} `Parsers` to enable chaining.
+ * @api public
+ */
+
+Parsers.prototype.registerGlob = function (ext, patterns, options) {
+  debug('parsers: %s', chalk.magenta(patterns));
+
+  var opts = extend({}, options);
+
+  var arr = [];
+  glob.sync(arrayify(patterns), opts).forEach(function (filepath) {
+    try {
+      arr.push(require(path.resolve(filepath)));
+    } catch (err) {
+      throw new Error('#parsers:', err);
+    }
+  });
+
+  this.parser(ext, arr);
   return this;
 };
 
@@ -132,11 +211,7 @@ Parsers.prototype.get = function(ext) {
     ext = '.' + ext;
   }
 
-  var parser = this.parsers[ext];
-  if (!parser) {
-    parser = this.parsers['*'];
-  }
-  return parser;
+  return this.parsers[ext] || [];
 };
 
 
