@@ -43,7 +43,7 @@ Parsers.prototype.init = function(opts) {
 
 Parsers.prototype.defaultParsers = function() {
   debug('defaultParsers', arguments);
-  this.register('matter', require('parser-matter'));
+  this.register('matter', require('parser-front-matter'));
   this.register('*', require('parser-noop'));
 };
 

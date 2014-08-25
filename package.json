@@ -1,7 +1,7 @@
 {
   "name": "parser-cache",
   "description": "Cache and load parsers, similiar to consolidate.js engines.",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "homepage": "https://github.com/jonschlinkert/parser-cache",
   "author": {
     "name": "Jon Schlinkert",
@@ -56,9 +56,9 @@
   },
   "dependencies": {
     "debug": "^1.0.4",
-    "engine-utils": "^0.1.0",
     "gray-matter": "^0.4.2",
     "lodash": "^2.4.1",
+    "parser-front-matter": "^0.1.0",
     "parser-noop": "^0.1.0",
     "parser-utils": "^0.1.0"
   }
