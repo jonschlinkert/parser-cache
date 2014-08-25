@@ -18,7 +18,7 @@ var debug = require('debug')('parser-cache');
 
 function Parsers (options) {
   this.options = {};
-  this.cache = {};
+  this.parsers = {};
   this.init(options);
 }
 
@@ -101,14 +101,14 @@ Parsers.prototype.register = function (ext, options, fn) {
 
   debug('[registered] %s: %j', ext, parser);
 
-  this.cache[ext] = parser;
+  this.parsers[ext] = parser;
   return this;
 };
 
 
 /**
  * Return the parser stored by `ext`. If no `ext`
- * is passed, the entire cache is returned.
+ * is passed, the entire parsers is returned.
  *
  * ```js
  * var consolidate = require('consolidate')
@@ -125,7 +125,7 @@ Parsers.prototype.register = function (ext, options, fn) {
 
 Parsers.prototype.get = function(ext) {
   if (!ext) {
-    return this.cache;
+    return this.parsers;
   }
 
   ext = ext || this.noop;
@@ -133,17 +133,17 @@ Parsers.prototype.get = function(ext) {
     ext = '.' + ext;
   }
 
-  var parser = this.cache[ext];
+  var parser = this.parsers[ext];
   if (!parser) {
-    parser = this.cache['*'];
+    parser = this.parsers['*'];
   }
   return parser;
 };
 
 
 /**
- * Remove `ext` from the cache, or if no value is
- * specified the entire cache is reset.
+ * Remove `ext` from the parsers, or if no value is
+ * specified the entire parsers is reset.
  *
  * **Example:**
  *
@@ -161,9 +161,9 @@ Parsers.prototype.clear = function(ext) {
     if (ext[0] !== '.') {
       ext = '.' + ext;
     }
-    delete this.cache[ext];
+    delete this.parsers[ext];
   } else {
-    this.cache = {};
+    this.parsers = {};
   }
 };
 

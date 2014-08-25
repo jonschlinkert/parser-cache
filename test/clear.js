@@ -18,7 +18,7 @@ describe('parsers register', function() {
   });
 
   describe('.clear()', function() {
-    it('should clear a property from the `cache` object.', function() {
+    it('should clear a property from the `parsers` object.', function() {
       parsers.register('a', {
         parse: function () {}
       });
@@ -32,22 +32,22 @@ describe('parsers register', function() {
         parse: function () {}
       });
 
-      parsers.cache.should.have.property('.a');
-      parsers.cache.should.have.property('.b');
-      parsers.cache.should.have.property('.c');
-      parsers.cache.should.have.property('.d');
-      Object.keys(parsers.cache).length.should.equal(4);
+      parsers.parsers.should.have.property('.a');
+      parsers.parsers.should.have.property('.b');
+      parsers.parsers.should.have.property('.c');
+      parsers.parsers.should.have.property('.d');
+      Object.keys(parsers.parsers).length.should.equal(4);
 
 
       parsers.clear('a');
-      parsers.cache.should.not.have.property('.a');
-      parsers.cache.should.have.property('.b');
-      Object.keys(parsers.cache).length.should.equal(3);
+      parsers.parsers.should.not.have.property('.a');
+      parsers.parsers.should.have.property('.b');
+      Object.keys(parsers.parsers).length.should.equal(3);
 
       parsers.clear('b');
-      parsers.cache.should.not.have.property('.a');
-      parsers.cache.should.not.have.property('.b');
-      Object.keys(parsers.cache).length.should.equal(2);
+      parsers.parsers.should.not.have.property('.a');
+      parsers.parsers.should.not.have.property('.b');
+      Object.keys(parsers.parsers).length.should.equal(2);
     });
   });
 });

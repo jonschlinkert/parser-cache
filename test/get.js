@@ -18,7 +18,7 @@ describe('parsers register', function() {
   });
 
   describe('.remove()', function() {
-    it('should remove a property from the `cache` object.', function() {
+    it('should remove a property from the `parsers` object.', function() {
       parsers.register('a', {
         parse: function () {}
       });
@@ -32,7 +32,7 @@ describe('parsers register', function() {
         parse: function () {}
       });
 
-      Object.keys(parsers.cache).length.should.equal(4);
+      Object.keys(parsers.parsers).length.should.equal(4);
 
       parsers.get('a').should.have.property('parse');
       parsers.get('b').should.have.property('parse');
