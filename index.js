@@ -11,14 +11,13 @@ var debug = require('debug')('parser-cache');
  * var parsers = new Parsers();
  * ```
  *
- * @method `parsers`
  * @param {Object} `options` Default options to use.
  * @api public
  */
 
 function Parsers (options) {
-  this.options = {};
   this.parsers = {};
+  this.options = {};
   this.init(options);
 }
 
@@ -45,7 +44,7 @@ Parsers.prototype.init = function(opts) {
 Parsers.prototype.defaultParsers = function() {
   debug('defaultParsers', arguments);
   this.register('matter', require('parser-matter'));
-  this.register('*', require('./lib/parsers/noop'));
+  this.register('*', require('parser-noop'));
 };
 
 
