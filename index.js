@@ -2,11 +2,11 @@
 
 
 var path = require('path');
-var _ = require('lodash');
 var util = require('util');
-var Plugins = require('plugins');
+var chalk = require('chalk');
 var arrayify = require('arrayify-compact');
 var utils = require('parser-utils');
+var _ = require('lodash');
 
 
 /**
@@ -20,7 +20,7 @@ var utils = require('parser-utils');
  */
 
 function Parsers (options) {
-  this.parsers = {};
+  this.parsers = [];
   this.options = {};
   this.init(options);
 }
@@ -33,7 +33,7 @@ function Parsers (options) {
  */
 
 Parsers.prototype.init = function(opts) {
-  this.defaultParsers();
+  // this.defaultParsers();
   this.extend(opts);
 };
 
@@ -44,10 +44,10 @@ Parsers.prototype.init = function(opts) {
  * @api private
  */
 
-Parsers.prototype.defaultParsers = function() {
-  this.register('md', require('parser-front-matter'));
-  this.register('*', require('parser-noop'));
-};
+// Parsers.prototype.defaultParsers = function() {
+//   this.register('md', require('parser-front-matter'));
+//   this.register('*', require('parser-noop'));
+// };
 
 
 /**
@@ -65,109 +65,41 @@ Parsers.prototype.defaultParsers = function() {
  * @api public
  */
 
-Parsers.prototype.register = function(ext, fn) {
-  if (ext[0] !== '.') {
-    ext = '.' + ext;
-  }
+// Parsers.prototype.register = function (fn) {
+//   fn = arrayify(fn).filter(function(plugin) {
+//     if (typeof plugin !== 'function') {
+//       var msg = console.log(chalk.magenta(plugin));
+//       throw new TypeError('plugin() expected a function, but got:', msg);
+//     }
+//     return true;
+//   }.bind(this));
 
-  this.parsers[ext] = this.parsers[ext] || [];
-
-  if (typeof fn === 'function') {
-    this.parsers[ext].push(fn);
-    return this;
-  }
-
-  var parsers = this.parsers[ext];
-  var data = fn;
-
-  for (var i = 0, len = parsers.length; i < len; i++) {
-    var parse = parsers[i];
-    try {
-      var o = parse(data);
-      if (o && typeof o === 'object') {
-        return o;
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  }
-}
-
-
-/**
- * Run a file through a parser stack.
- *
- * @param  {Object} `file`
- * @param  {Object} `opts`
- * @return {Object}
- */
-// Parsers.prototype.run = function (file, options, next) {
-//   file = _.extend({}, file);
-//   var parsers, ext;
-
-//   if (Array.isArray(options)) {
-//     parsers = options;
-//     options = {};
-//   }
-
-//   var opts = _.extend({}, options);
-
-//   var ext = file.ext || path.extname(file.path) || opts.ext;
-//   if (!ext) {
-//     throw new Error('parser() exception:', console.log(ext));
-//   }
-
-//   if (ext[0] !== '.') {
-//     ext = '.' + ext;
-//   }
-
-//   parsers = parsers || this.parsers[ext];
-
-//   if (parsers && parsers.length) {
-//     parsers.forEach(function (parser) {
-//       try {
-//         file = parser.call(this, file, opts);
-//       } catch (err) {
-//         throw new Error('parser.run()', err);
-//       }
-//     }.bind(this));
-//   }
-//   return file;
+//   this.parsers = this.parsers.concat(fn);
+//   return this;
 // };
 
 
-Parsers.prototype.run = function(file, options) {
-  var opts = _.extend({}, options);
-  var ext = file.ext || opts.ext || this.get('ext');
+Parsers.prototype.parser = function(ext, fn, options) {
 
-  if (!ext) {
-    ext = '*'
-  }
-
-  this.get(ext).forEach(function (parser, i) {
-    if (typeof parser !== 'function') {
-      throw new Error('parsers should be a function.');
-    }
-
-    parser(file, opts, function (err, file) {
-      if (err) {
-        next(err);
-        return;
-      }
-      next(null, str, data);
-    }.bind(this));
-  });
 };
+
+
+
+Parsers.prototype.register = function(ext, fn) {
+  // this.parsers[ext] = this.parsers[ext] || new Plugins();
+  // this.parsers[ext].use(fn);
+  this.get(ext).use(fn);
+};
+
 
 /**
  * Return the parser stored by `ext`. If no `ext`
  * is passed, the entire parsers is returned.
  *
  * ```js
- * var consolidate = require('consolidate')
- * parser.set('hbs', consolidate.handlebars)
- * parser.get('hbs')
- * // => {parse: [function], parseFile: [function]}
+ * parser.set('md', function() {});
+ * parser.get('md')
+ * // => [function]
  * ```
  *
  * @method get
@@ -181,12 +113,17 @@ Parsers.prototype.get = function(ext) {
     return this.parsers;
   }
 
-  ext = ext || this.noop;
+  ext = ext || '*';
+
   if (ext[0] !== '.') {
     ext = '.' + ext;
   }
 
-  return this.parsers[ext] || [];
+  if (!this.parsers[ext]) {
+    this.parsers[ext] = new Plugins();
+  }
+
+  return this.parsers[ext];
 };
 
 

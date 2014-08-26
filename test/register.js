@@ -27,16 +27,6 @@ describe('parsers register', function() {
       parsers.register('d', function d1() {});
       parsers.register('d', function d2() {});
 
-
-      parsers.register('.md', function(file, next) {
-        // return next(null, yaml.load(file));
-        return next(null, JSON.parse(file));
-      });
-
-      parsers.register('.md', function(file, next) {
-        return next(null, JSON.parse(file));
-      });
-
       console.log(parsers)
 
       parsers.parsers.should.have.property('.a');
