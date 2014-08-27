@@ -27,13 +27,16 @@ describe('parsers register', function() {
       parsers.register('d', function d1() {});
       parsers.register('d', function d2() {});
 
-      console.log(parsers)
-
       parsers.parsers.should.have.property('.a');
       parsers.parsers.should.have.property('.b');
       parsers.parsers.should.have.property('.c');
       parsers.parsers.should.have.property('.d');
-      // Object.keys(parsers.parsers).length.should.equal(4);
+
+      Object.keys(parsers.parsers['.a']).length.should.equal(2);
+      Object.keys(parsers.parsers['.b']).length.should.equal(1);
+      Object.keys(parsers.parsers['.c']).length.should.equal(1);
+      Object.keys(parsers.parsers['.d']).length.should.equal(2);
+      Object.keys(parsers.parsers).length.should.equal(4);
     });
 
     it('should normalize parser extensions to not have a dot.', function() {

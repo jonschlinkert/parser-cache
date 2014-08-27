@@ -17,13 +17,8 @@ describe('parsers init', function() {
     parsers.clear();
   });
 
-  describe('.defaults()', function() {
-    it('should set defaults on the `options` object.', function() {
-      parsers.init({x: 'x', y: 'y', z: 'z'})
-
-      parsers.options.should.have.property('x');
-      parsers.options.should.have.property('y');
-      parsers.options.should.have.property('z');
-    });
+  it('should initialize default parsers', function() {
+    parsers.init();
+    Object.keys(parsers.parsers).length.should.equal(2);
   });
 });
