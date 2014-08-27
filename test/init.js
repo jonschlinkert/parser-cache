@@ -14,16 +14,11 @@ var parsers = new Parsers();
 
 describe('parsers init', function() {
   beforeEach(function() {
-    parsers.clear();
+    parsers.reset();
   });
 
-  describe('.defaults()', function() {
-    it('should set defaults on the `options` object.', function() {
-      parsers.init({x: 'x', y: 'y', z: 'z'})
-
-      parsers.options.should.have.property('x');
-      parsers.options.should.have.property('y');
-      parsers.options.should.have.property('z');
-    });
+  it('should initialize default', function() {
+    parsers.init();
+    Object.keys(parsers.parsers).length.should.equal(1);
   });
 });

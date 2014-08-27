@@ -7,47 +7,28 @@
 
 'use strict';
 
+var assert = require('assert');
 var should = require('should');
 var Parsers = require('..');
 var parsers = new Parsers();
 
 
-describe('parsers register', function() {
+describe('parsers reset', function() {
   beforeEach(function() {
-    parsers.clear();
+    parsers.reset();
   });
 
-  describe('.clear()', function() {
-    it('should clear a property from the `parsers` object.', function() {
-      parsers.register('a', {
-        parse: function () {}
-      });
-      parsers.register('b', {
-        parse: function () {}
-      });
-      parsers.register('c', {
-        parse: function () {}
-      });
-      parsers.register('d', {
-        parse: function () {}
-      });
+  describe('.reset()', function() {
+    it('should reset a parser stack', function() {
+      // a
+      parsers.register('a', function () {});
+      parsers.register('a', function () {});
+      parsers.register('a', function () {});
 
-      parsers.parsers.should.have.property('.a');
-      parsers.parsers.should.have.property('.b');
-      parsers.parsers.should.have.property('.c');
-      parsers.parsers.should.have.property('.d');
-      Object.keys(parsers.parsers).length.should.equal(4);
-
-
-      parsers.clear('a');
-      parsers.parsers.should.not.have.property('.a');
-      parsers.parsers.should.have.property('.b');
-      Object.keys(parsers.parsers).length.should.equal(3);
-
-      parsers.clear('b');
-      parsers.parsers.should.not.have.property('.a');
-      parsers.parsers.should.not.have.property('.b');
-      Object.keys(parsers.parsers).length.should.equal(2);
+      parsers.get('a').should.be.an.array;
+      Object.keys(parsers.get('a')).length.should.equal(3);
+      parsers.reset('a');
+      assert.equal(typeof parsers.get('a'), 'undefined');
     });
   });
 });

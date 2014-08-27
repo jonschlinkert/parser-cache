@@ -1,8 +1,7 @@
 'use strict';
 
 
-var _ = require('lodash');
-var debug = require('debug')('parser-cache');
+var Plugins = require('plugins');
 
 
 /**
@@ -16,8 +15,6 @@ var debug = require('debug')('parser-cache');
  */
 
 function Parsers (options) {
-  this.parsers = {};
-  this.options = {};
   this.init(options);
 }
 
@@ -28,10 +25,9 @@ function Parsers (options) {
  * @api private
  */
 
-Parsers.prototype.init = function(opts) {
-  debug('init', arguments);
+Parsers.prototype.init = function() {
+  this.parsers = {};
   this.defaultParsers();
-  this.extend(opts);
 };
 
 
@@ -42,65 +38,85 @@ Parsers.prototype.init = function(opts) {
  */
 
 Parsers.prototype.defaultParsers = function() {
-  debug('defaultParsers', arguments);
-  this.register('matter', require('parser-front-matter'));
   this.register('*', require('parser-noop'));
 };
 
 
 /**
- * Register the given parser callback `fn` as `ext`.
+ * Register the given parser callback `fn` as `ext`. If `ext`
+ * is not given, the parser `fn` will be pushed into the
+ * default parser stack.
  *
  * ```js
- * var parser = require('parsnip');
- * parsers.register('hbs', parser.markdown);
+ * // Default stack
+ * parsers.register(require('parser-front-matter'));
+ *
+ * // Associated with `.hbs` file extension
+ * parsers.register('hbs', require('parser-front-matter'));
  * ```
  *
  * @param {String} `ext`
  * @param {Function|Object} `fn` or `options`
- * @param {Object} `options`
- * @return {parsers} to enable chaining.
+ * @return {Object} `parsers` to enable chaining.
  * @api public
  */
 
-Parsers.prototype.register = function (ext, options, fn) {
-  var args = [].slice.call(arguments);
-
-  debug('[register]', arguments);
-  var parser = {};
-
-  if (args.length === 3 && typeof options === 'function') {
-    var opts = fn;
-    fn = options;
-    options = opts;
-  }
-
-  if (args.length === 2) {
-    fn = options;
-    options = {};
-  }
-
-  if (typeof fn === 'function') {
-    parser = fn;
-    parser.parse = fn.parse;
-  } else if (typeof fn === 'object') {
-    parser = fn || this.noop;
-    parser.parseFile = fn.parseFile;
-  }
-
-  parser.options = fn.options || options || {};
-
-  if (typeof parser.parse !== 'function') {
-    throw new Error('Parsers are expected to have a `parse` method.');
+Parsers.prototype.register = function(ext, fn) {
+  if (typeof ext !== 'string') {
+    fn = ext;
+    ext = '*';
   }
 
   if (ext[0] !== '.') {
     ext = '.' + ext;
   }
 
-  debug('[registered] %s: %j', ext, parser);
+  if (!this.parsers[ext]) {
+    this.parsers[ext] = [];
+  }
 
-  this.parsers[ext] = parser;
+  if (fn.hasOwnProperty('parse')) {
+    fn = fn.parse;
+  }
+
+  if (typeof fn === 'function') {
+    this.parsers[ext].push(fn);
+    return this;
+  }
+};
+
+
+/**
+ * Run a stack of parser for the given `file`. If `file` is an object
+ * with an `ext` property, then `ext` is used to get the parser
+ * stack. If `ext` doesn't have a stack, the default `noop` parser
+ * will be used.
+ *
+ * @param  {Object|String} `file` Either a string or an object.
+ * @param  {Array} `stack` Optionally pass an array of functions to use as parsers.
+ * @param  {Object} `options`
+ * @return {Object} Normalize `file` object.
+ */
+
+Parsers.prototype.parse = function(file, stack, options) {
+  var args = [].slice.call(arguments);
+  var parsers = new Plugins();
+
+  if (!Array.isArray(args[1])) {
+    args[2] = stack;
+    args[1] = null;
+  }
+
+  var ext = file.ext || options && options.ext;
+  if (!ext) {
+    ext = '*';
+  }
+
+  if (!args[1] || !args[1].length) {
+    args[1] = this.get(ext);
+  }
+
+  parsers.run.apply(this, args);
   return this;
 };
 
@@ -110,10 +126,9 @@ Parsers.prototype.register = function (ext, options, fn) {
  * is passed, the entire parsers is returned.
  *
  * ```js
- * var consolidate = require('consolidate')
- * parser.set('hbs', consolidate.handlebars)
- * parser.get('hbs')
- * // => {parse: [function], parseFile: [function]}
+ * parser.set('md', function() {});
+ * parser.get('md')
+ * // => [function]
  * ```
  *
  * @method get
@@ -127,35 +142,31 @@ Parsers.prototype.get = function(ext) {
     return this.parsers;
   }
 
-  ext = ext || this.noop;
+  ext = ext || '*';
   if (ext[0] !== '.') {
     ext = '.' + ext;
   }
 
-  var parser = this.parsers[ext];
-  if (!parser) {
-    parser = this.parsers['*'];
-  }
-  return parser;
+  return this.parsers[ext];
 };
 
 
 /**
- * Remove `ext` from the parsers, or if no value is
- * specified the entire parsers is reset.
+ * Remove the parser stack for the given `ext`, or
+ * if no value is specified the entire parsers object
+ * is reset.
  *
  * **Example:**
  *
  * ```js
- * parsers.clear()
+ * parsers.reset()
  * ```
  *
- * @chainable
- * @method clear
+ * @param {String} `ext` The stack to remove.
  * @api public
  */
 
-Parsers.prototype.clear = function(ext) {
+Parsers.prototype.reset = function(ext) {
   if (ext) {
     if (ext[0] !== '.') {
       ext = '.' + ext;
@@ -164,60 +175,6 @@ Parsers.prototype.clear = function(ext) {
   } else {
     this.parsers = {};
   }
-};
-
-
-/**
- * Set or get an option.
- *
- * ```js
- * parsers.option('a', true)
- * parsers.option('a')
- * // => true
- * ```
- *
- * @method option
- * @param {String} `key`
- * @param {*} `value`
- * @return {parsers} to enable chaining.
- * @api public
- */
-
-Parsers.prototype.option = function(key, value) {
-  var args = [].slice.call(arguments);
-
-  if (args.length === 1 && typeof key === 'string') {
-    return this.options[key];
-  }
-
-  if (typeof key === 'object') {
-    _.extend.apply(_, [this.options].concat(args));
-    return this;
-  }
-
-  this.options[key] = value;
-  return this;
-};
-
-
-/**
- * Extend the options with the given `obj`.
- *
- * ```js
- * parsers.extend({a: 'b'})
- * parsers.option('a')
- * // => 'b'
- * ```
- *
- * @method extend
- * @param {Object} `obj`
- * @return {parsers} to enable chaining.
- * @api public
- */
-
-Parsers.prototype.extend = function(obj) {
-  this.options = _.extend({}, this.options, obj);
-  return this;
 };
 
 
