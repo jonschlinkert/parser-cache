@@ -1,66 +1,66 @@
-// /*!
-//  * parsers <https://github.com/jonschlinkert/parsers>
-//  *
-//  * Copyright (c) 2014 Jon Schlinkert, contributors.
-//  * Licensed under the MIT License
-//  */
+/*!
+ * parsers <https://github.com/jonschlinkert/parsers>
+ *
+ * Copyright (c) 2014 Jon Schlinkert, contributors.
+ * Licensed under the MIT License
+ */
 
-// var file = require('fs-utils');
-// var should = require('should');
-// var Parsers = require('..');
-
-
-// function fixture(filename) {
-//   return file.readFileSync('test/fixtures/' + filename);
-// }
-
-// function actual(filename, content) {
-//   return file.writeFileSync('test/actual/' + filename, content);
-// }
+var file = require('fs-utils');
+var should = require('should');
+var Parsers = require('..');
 
 
-// describe('parsers:', function () {
-//   it('should run a parser and return the result:', function () {
-//     var parsers = new Parsers();
+function fixture(filename) {
+  return file.readFileSync('test/fixtures/' + filename);
+}
 
-//     parsers.register(function(val) {
-//       return 'abc-' + val;
-//     });
-
-//     parsers.run('xyz').should.equal('abc-xyz')
-//   });
+function actual(filename, content) {
+  return file.writeFileSync('test/actual/' + filename, content);
+}
 
 
-//   it('should run a parser with options:', function () {
-//     var parsers = new Parsers();
+describe('parsers:', function () {
+  it('should run a parser and return the result:', function () {
+    var parsers = new Parsers();
 
-//     var abc = function (opts) {
-//       return function(val) {
-//         return 'abc' + opts + val;
-//       }
-//     };
+    parsers.register('a', function(file, next) {
+      next(null, 'abc-' + file.content);
+    });
 
-//     parsers.register(abc('|'));
-//     parsers.run('xyz').should.equal('abc|xyz')
-//   });
+    parsers.parse({ext: 'a'}, 'xyz').should.equal('abc-xyz')
+  });
 
 
-//   it('should run a stack of parsers passed directly to `.run()`:', function () {
-//     var parsers = new Parsers();
+  // it('should run a parser with options:', function () {
+  //   var parsers = new Parsers();
 
-//     var a = function(val) {
-//       return val + 'a';
-//     };
-//     var b = function(val) {
-//       return val + 'b';
-//     };
-//     var c = function(val) {
-//       return val + 'c';
-//     };
+  //   var abc = function (opts) {
+  //     return function(val) {
+  //       return 'abc' + opts + val;
+  //     }
+  //   };
 
-//     parsers.run('alphabet-', [a, b, c]).should.equal('alphabet-abc')
-//   });
-// });
+  //   parsers.register(abc('|'));
+  //   parsers.run('xyz').should.equal('abc|xyz')
+  // });
+
+
+  // it('should run a stack of parsers passed directly to `.run()`:', function () {
+  //   var parsers = new Parsers();
+
+  //   var a = function(val) {
+  //     return val + 'a';
+  //   };
+  //   var b = function(val) {
+  //     return val + 'b';
+  //   };
+  //   var c = function(val) {
+  //     return val + 'c';
+  //   };
+
+  //   parsers.run('alphabet-', [a, b, c]).should.equal('alphabet-abc')
+  // });
+});
 
 
 // describe('parsers.run() async:', function () {

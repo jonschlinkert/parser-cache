@@ -38,7 +38,6 @@ Parsers.prototype.init = function() {
  */
 
 Parsers.prototype.defaultParsers = function() {
-  this.register('md', require('parser-front-matter'));
   this.register('*', require('parser-noop'));
 };
 
@@ -65,6 +64,10 @@ Parsers.prototype.register = function(ext, fn) {
 
   if (!this.parsers[ext]) {
     this.parsers[ext] = [];
+  }
+
+  if (fn.hasOwnProperty('parse')) {
+    fn = fn.parse;
   }
 
   if (typeof fn === 'function') {
