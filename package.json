@@ -49,17 +49,16 @@
     "test": "mocha -R spec"
   },
   "devDependencies": {
+    "gray-matter": "^0.4.2",
+    "lodash": "^2.4.1",
     "mocha": "*",
+    "parser-noop": "^0.1.0",
+    "parser-utils": "^0.1.0",
     "should": "^4.0.4",
     "verb": ">= 0.2.6",
     "verb-tag-jscomments": "^0.2.0"
   },
   "dependencies": {
-    "gray-matter": "^0.4.2",
-    "lodash": "^2.4.1",
-    "parser-front-matter": "^0.1.0",
-    "parser-noop": "^0.1.0",
-    "parser-utils": "^0.1.0",
     "plugins": "^0.2.1"
   }
 }
