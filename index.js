@@ -38,7 +38,6 @@ Parsers.prototype.init = function() {
  */
 
 Parsers.prototype.defaultParsers = function() {
-  this.register('md', require('parser-front-matter'));
   this.register('*', require('parser-noop'));
 };
 
@@ -47,8 +46,7 @@ Parsers.prototype.defaultParsers = function() {
  * Register the given parser callback `fn` as `ext`.
  *
  * ```js
- * var parser = require('parsnip');
- * parsers.register('hbs', parser.markdown);
+ * parsers.register('hbs', require('parser-front-matter'));
  * ```
  *
  * @param {String} `ext`
@@ -75,7 +73,7 @@ Parsers.prototype.register = function(ext, fn) {
 
 
 /**
- * Run a parser stack for the given `file`. If `file` is an object
+ * Run a stack of parser for the given `file`. If `file` is an object
  * with an `ext` property, then `ext` is used to get the parser
  * stack. If `ext` doesn't have a stack, the default `noop` parser
  * will be used.

@@ -8,18 +8,29 @@
 'use strict';
 
 var should = require('should');
-var Parsers = require('..');
-var parsers = new Parsers();
+var matter = require('gray-matter');
 var utils = require('parser-utils');
 var _ = require('lodash');
+
+var Parsers = require('..');
+var parsers = new Parsers();
+
 
 describe('default parsers', function () {
   before(function () {
     parsers.init();
+
+    parsers.register('md', function md (file, next) {
+      file = utils.extendFile(file);
+      _.merge(file, matter(file.content));
+      next(null, file);
+    });
   });
 
 
+
   it('should parse content with the default parser.', function (done) {
+
     parsers.parse('str', function (err, file) {
       if (err) {
         console.log(err);

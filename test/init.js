@@ -17,8 +17,8 @@ describe('parsers init', function() {
     parsers.clear();
   });
 
-  it('should initialize default parsers', function() {
+  it('should initialize default', function() {
     parsers.init();
-    Object.keys(parsers.parsers).length.should.equal(2);
+    Object.keys(parsers.parsers).length.should.equal(1);
   });
 });
