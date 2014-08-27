@@ -1,7 +1,7 @@
 {
   "name": "parser-cache",
   "description": "Cache and load parsers, similiar to consolidate.js engines.",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "homepage": "https://github.com/jonschlinkert/parser-cache",
   "author": {
     "name": "Jon Schlinkert",
@@ -52,13 +52,13 @@
     "gray-matter": "^0.4.2",
     "lodash": "^2.4.1",
     "mocha": "*",
-    "parser-noop": "^0.1.0",
-    "parser-utils": "^0.1.0",
     "should": "^4.0.4",
     "verb": ">= 0.2.6",
     "verb-tag-jscomments": "^0.2.0"
   },
   "dependencies": {
-    "plugins": "^0.2.1"
+    "parser-noop": "^0.2.2",
+    "parser-utils": "^0.2.0",
+    "plugins": "^0.3.0"
   }
 }
