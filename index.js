@@ -43,20 +43,30 @@ Parsers.prototype.defaultParsers = function() {
 
 
 /**
- * Register the given parser callback `fn` as `ext`.
+ * Register the given parser callback `fn` as `ext`. If `ext`
+ * is not given, the parser `fn` will be pushed into the
+ * default parser stack.
  *
  * ```js
+ * // Default stack
+ * parsers.register(require('parser-front-matter'));
+ *
+ * // Associated with `.hbs` file extension
  * parsers.register('hbs', require('parser-front-matter'));
  * ```
  *
  * @param {String} `ext`
  * @param {Function|Object} `fn` or `options`
- * @param {Object} `options`
- * @return {parsers} to enable chaining.
+ * @return {Object} `parsers` to enable chaining.
  * @api public
  */
 
 Parsers.prototype.register = function(ext, fn) {
+  if (typeof ext !== 'string') {
+    fn = ext;
+    ext = '*';
+  }
+
   if (ext[0] !== '.') {
     ext = '.' + ext;
   }
@@ -142,21 +152,21 @@ Parsers.prototype.get = function(ext) {
 
 
 /**
- * Remove `ext` from the parsers, or if no value is
- * specified the entire parsers is reset.
+ * Remove the parser stack for the given `ext`, or
+ * if no value is specified the entire parsers object
+ * is reset.
  *
  * **Example:**
  *
  * ```js
- * parsers.clear()
+ * parsers.reset()
  * ```
  *
- * @chainable
- * @method clear
+ * @param {String} `ext` The stack to remove.
  * @api public
  */
 
-Parsers.prototype.clear = function(ext) {
+Parsers.prototype.reset = function(ext) {
   if (ext) {
     if (ext[0] !== '.') {
       ext = '.' + ext;

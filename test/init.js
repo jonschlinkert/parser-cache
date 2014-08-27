@@ -14,7 +14,7 @@ var parsers = new Parsers();
 
 describe('parsers init', function() {
   beforeEach(function() {
-    parsers.clear();
+    parsers.reset();
   });
 
   it('should initialize default', function() {

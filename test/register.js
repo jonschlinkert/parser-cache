@@ -15,7 +15,7 @@ var parsers = new Parsers();
 
 describe('parsers register', function() {
   beforeEach(function() {
-    parsers.clear();
+    parsers.reset();
   });
 
   describe('.register()', function() {

@@ -13,13 +13,13 @@ var Parsers = require('..');
 var parsers = new Parsers();
 
 
-describe('parsers clear', function() {
+describe('parsers reset', function() {
   beforeEach(function() {
-    parsers.clear();
+    parsers.reset();
   });
 
-  describe('.clear()', function() {
-    it('should clear a parser stack', function() {
+  describe('.reset()', function() {
+    it('should reset a parser stack', function() {
       // a
       parsers.register('a', function () {});
       parsers.register('a', function () {});
@@ -27,7 +27,7 @@ describe('parsers clear', function() {
 
       parsers.get('a').should.be.an.array;
       Object.keys(parsers.get('a')).length.should.equal(3);
-      parsers.clear('a');
+      parsers.reset('a');
       assert.equal(typeof parsers.get('a'), 'undefined');
     });
   });
