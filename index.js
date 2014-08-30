@@ -90,30 +90,13 @@ Parsers.prototype.register = function(ext, fn) {
 
 
 /**
- * Run a stack of parser for the given `file`. If `file` is an object
- * with an `ext` property, then `ext` is used to get the parser
- * stack. If `ext` doesn't have a stack, the default `noop` parser
- * will be used.
- *
- * ```js
- * var str = fs.readFileSync('some-file.md', 'utf8');
- * template.parse({ext: '.md', content: str}, function (err, file) {
- *   console.log(file);
- * });
- * ```
- *
- * Or, explicitly pass an array of parser functions as a section argument.
- *
- * ```js
- * template.parse(file, [a, b, c], function (err, file) {
- *   console.log(file);
- * });
- * ```
+ * Private method for registering parsers.
  *
  * @param  {Object|String} `file` Either a string or an object.
  * @param  {Array} `stack` Optionally pass an array of functions to use as parsers.
  * @param  {Object} `options`
  * @return {Object} Normalize `file` object.
+ * @api private
  */
 
 Parsers.prototype._parse = function(file, stack, options) {
@@ -136,6 +119,35 @@ Parsers.prototype._parse = function(file, stack, options) {
   return args;
 };
 
+
+/**
+ * Run a stack of **async** parsers for the given `file`. If `file`
+ * is an object with an `ext` property, then `ext` is used to get
+ * the parser stack. If `ext` doesn't have a stack, the default `noop`
+ * parser will be used.
+ *
+ * ```js
+ * var str = fs.readFileSync('some-file.md', 'utf8');
+ * template.parse({ext: '.md', content: str}, function (err, file) {
+ *   console.log(file);
+ * });
+ * ```
+ *
+ * Or, explicitly pass an array of parser functions as a section argument.
+ *
+ * ```js
+ * template.parse(file, [a, b, c], function (err, file) {
+ *   console.log(file);
+ * });
+ * ```
+ *
+ * @param  {Object|String} `file` Either a string or an object.
+ * @param  {Array} `stack` Optionally pass an array of functions to use as parsers.
+ * @param  {Object} `options`
+ * @return {Object} Normalize `file` object.
+ * @api public
+ */
+
 Parsers.prototype.parse = function(file, stack, options) {
   var args = this._parse.apply(this, arguments);
   var parsers = new Plugins();
@@ -146,6 +158,30 @@ Parsers.prototype.parse = function(file, stack, options) {
 
   return parsers.run.apply(this, args);
 };
+
+/**
+ * Run a stack of **async** parsers for the given `file`. If `file`
+ * is an object with an `ext` property, then `ext` is used to get
+ * the parser stack. If `ext` doesn't have a stack, the default `noop`
+ * parser will be used.
+ *
+ * ```js
+ * var str = fs.readFileSync('some-file.md', 'utf8');
+ * template.parseSync({ext: '.md', content: str});
+ * ```
+ *
+ * Or, explicitly pass an array of parser functions as a section argument.
+ *
+ * ```js
+ * template.parseSync(file, [a, b, c]);
+ * ```
+ *
+ * @param  {Object|String} `file` Either a string or an object.
+ * @param  {Array} `stack` Optionally pass an array of functions to use as parsers.
+ * @param  {Object} `options`
+ * @return {Object} Normalize `file` object.
+ * @api public
+ */
 
 Parsers.prototype.parseSync = function(file, stack, options) {
   var args = this._parse.apply(this, arguments);
