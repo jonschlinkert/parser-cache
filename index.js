@@ -92,6 +92,21 @@ Parsers.prototype.register = function(ext, fn) {
  * stack. If `ext` doesn't have a stack, the default `noop` parser
  * will be used.
  *
+ * ```js
+ * var str = fs.readFileSync('some-file.md', 'utf8');
+ * template.parse({ext: '.md', content: str}, function (err, file) {
+ *   console.log(file);
+ * });
+ * ```
+ *
+ * Or, explicitly pass an array of parser functions as a section argument.
+ *
+ * ```js
+ * template.parse(file, [a, b, c], function (err, file) {
+ *   console.log(file);
+ * });
+ * ```
+ *
  * @param  {Object|String} `file` Either a string or an object.
  * @param  {Array} `stack` Optionally pass an array of functions to use as parsers.
  * @param  {Object} `options`
