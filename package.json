@@ -57,6 +57,7 @@
     "verb-tag-jscomments": "^0.2.0"
   },
   "dependencies": {
+    "lodash": "^2.4.1",
     "parser-noop": "^0.2.2",
     "parser-utils": "^0.2.0",
     "plugins": "^0.3.0"

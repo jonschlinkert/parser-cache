@@ -61,8 +61,9 @@ describe('parsers register', function() {
 
       var a = parsers.get('.a');
 
-      assert.equal(typeof a, 'object');
-      assert.equal(typeof a[0], 'function');
+      a.should.be.an.object;
+      a[0].should.be.an.object;
+      a[0].parse.should.be.a.function;
 
       parsers.parsers.should.have.property('.a');
       parsers.parsers.should.have.property('.b');

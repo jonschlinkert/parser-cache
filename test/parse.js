@@ -51,7 +51,6 @@ describe('default parsers', function () {
     });
 
     it('should register parsers to the default stack:', function (done) {
-
       parsers.parse({a: ''}, function (err, file) {
         file.a.should.equal('abc');
         done();

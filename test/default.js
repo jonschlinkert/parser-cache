@@ -19,10 +19,18 @@ var parsers = new Parsers();
 describe('parsers defaults', function () {
   before(function () {
     parsers.init();
-    parsers.register('md', function md (file, next) {
-      file = utils.extendFile(file);
-      _.merge(file, matter(file.content));
-      next(null, file);
+
+    parsers.register('md', {
+      parse: function (file, next) {
+        file = utils.extendFile(file);
+        _.merge(file, matter(file.content));
+        next(null, file);
+      },
+      parseSync: function (file) {
+        file = utils.extendFile(file);
+        _.merge(file, matter(file.content));
+        return file;
+      }
     });
   });
 
@@ -40,8 +48,8 @@ describe('parsers defaults', function () {
 
     parsers.parse('---\ntitle: ABC\n---\n', matter, function(err, file) {
       file.data.title.should.equal('ABC');
-      done();
     });
+    done();
   });
 
   it('should parse content with the default parser.', function (done) {
