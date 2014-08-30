@@ -2,6 +2,7 @@
 
 
 var Plugins = require('plugins');
+var _ = require('lodash');
 
 
 /**
@@ -75,14 +76,16 @@ Parsers.prototype.register = function(ext, fn) {
     this.parsers[ext] = [];
   }
 
-  if (fn.hasOwnProperty('parse')) {
-    fn = fn.parse;
-  }
+  var parser = {};
 
   if (typeof fn === 'function') {
-    this.parsers[ext].push(fn);
-    return this;
+    parser.parse = fn;
+  } else {
+    parser = fn;
   }
+
+  this.parsers[ext].push(parser);
+  return this;
 };
 
 
@@ -113,9 +116,8 @@ Parsers.prototype.register = function(ext, fn) {
  * @return {Object} Normalize `file` object.
  */
 
-Parsers.prototype.parse = function(file, stack, options) {
+Parsers.prototype._parse = function(file, stack, options) {
   var args = [].slice.call(arguments);
-  var parsers = new Plugins();
 
   if (!Array.isArray(args[1])) {
     args[2] = stack;
@@ -131,8 +133,29 @@ Parsers.prototype.parse = function(file, stack, options) {
     args[1] = this.get(ext);
   }
 
-  parsers.run.apply(this, args);
-  return this;
+  return args;
+};
+
+Parsers.prototype.parse = function(file, stack, options) {
+  var args = this._parse.apply(this, arguments);
+  var parsers = new Plugins();
+
+  args[1] = _.map(args[1], function(parser) {
+    return parser.parse;
+  });
+
+  return parsers.run.apply(this, args);
+};
+
+Parsers.prototype.parseSync = function(file, stack, options) {
+  var args = this._parse.apply(this, arguments);
+  var parsers = new Plugins();
+
+  args[1] = _.map(args[1], function(parser) {
+    return parser.parseSync;
+  });
+
+  return parsers.run.apply(this, args);
 };
 
 

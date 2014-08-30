@@ -20,12 +20,12 @@ describe('parsers reset', function() {
 
   describe('.reset()', function() {
     it('should reset a parser stack', function() {
-      // a
       parsers.register('a', function () {});
       parsers.register('a', function () {});
       parsers.register('a', function () {});
 
       parsers.get('a').should.be.an.array;
+
       Object.keys(parsers.get('a')).length.should.equal(3);
       parsers.reset('a');
       assert.equal(typeof parsers.get('a'), 'undefined');
