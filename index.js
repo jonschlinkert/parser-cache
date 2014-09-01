@@ -107,7 +107,7 @@ Parsers.prototype._parse = function(file, stack, options) {
     args[1] = null;
   }
 
-  var ext = file.ext || options && options.ext;
+  var ext = args[0].ext || options && options.ext;
   if (!ext) {
     ext = '*';
   }
