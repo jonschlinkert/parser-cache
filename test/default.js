@@ -84,7 +84,7 @@ describe('parsers defaults', function () {
       file.should.have.property('orig');
 
       file.data.should.eql({title: 'Front Matter'});
-      file.content.should.eql('\nThis is content.');
+      file.content.should.eql('This is content.');
     });
 
     done();
@@ -103,7 +103,7 @@ describe('parsers defaults', function () {
       file.should.have.property('orig');
 
       file.data.should.eql({title: 'ABC'});
-      file.content.should.eql('\n');
+      file.content.should.eql('');
 
       done();
     });

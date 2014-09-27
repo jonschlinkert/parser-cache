@@ -2,7 +2,6 @@
 
 
 var Plugins = require('plugins');
-var _ = require('lodash');
 
 
 /**
@@ -89,6 +88,53 @@ Parsers.prototype.register = function(ext, fn) {
 };
 
 
+
+/**
+ * Register the given parser callback `fn` as `ext`. If `ext`
+ * is not given, the parser `fn` will be pushed into the
+ * default parser stack.
+ *
+ * ```js
+ * // Default stack
+ * parsers.register(require('parser-front-matter'));
+ *
+ * // Associated with `.hbs` file extension
+ * parsers.register('hbs', require('parser-front-matter'));
+ * ```
+ *
+ * @param {String} `ext`
+ * @param {Function|Object} `fn` or `options`
+ * @return {Object} `parsers` to enable chaining.
+ * @api public
+ */
+
+Parsers.prototype.registerSync = function(ext, fn) {
+  if (typeof ext !== 'string') {
+    fn = ext;
+    ext = '*';
+  }
+
+  if (ext[0] !== '.') {
+    ext = '.' + ext;
+  }
+
+  if (!this.parsers[ext]) {
+    this.parsers[ext] = [];
+  }
+
+  var parser = {};
+
+  if (typeof fn === 'function') {
+    parser.parseSync = fn;
+  } else {
+    parser = fn;
+  }
+
+  this.parsers[ext].push(parser);
+  return this;
+};
+
+
 /**
  * Private method for registering parsers.
  *
@@ -152,15 +198,16 @@ Parsers.prototype.parse = function(file, stack, options) {
   var args = this._parse.apply(this, arguments);
   var parsers = new Plugins();
 
-  args[1] = _.map(args[1], function(parser) {
+  args[1] = args[1].map(function(parser) {
     return parser.parse;
   });
 
   return parsers.run.apply(this, args);
 };
 
+
 /**
- * Run a stack of **async** parsers for the given `file`. If `file`
+ * Run a stack of **sync** parsers for the given `file`. If `file`
  * is an object with an `ext` property, then `ext` is used to get
  * the parser stack. If `ext` doesn't have a stack, the default `noop`
  * parser will be used.
@@ -187,7 +234,7 @@ Parsers.prototype.parseSync = function(file, stack, options) {
   var args = this._parse.apply(this, arguments);
   var parsers = new Plugins();
 
-  args[1] = _.map(args[1], function(parser) {
+  args[1] = args[1].map(function(parser) {
     return parser.parseSync;
   });
 

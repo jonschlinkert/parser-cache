@@ -15,6 +15,63 @@ var _ = require('lodash');
 
 describe('parsers utils', function() {
 
+  describe('.diffKeys()', function() {
+    it('should return the difference between valid file object keys and supplied keys.', function() {
+       var file = {a: 'a', b: 'b', path: 'a/b/c.md'};
+       utils.diffKeys(file).should.eql(['a', 'b']);
+    });
+
+    it('should concat the given keys to the difference.', function() {
+       var file = {a: 'a', b: 'b', path: 'a/b/c.md'};
+       utils.diffKeys(file, ['c', 'd']).should.eql(['a', 'b', 'c', 'd']);
+    });
+  });
+
+  describe('.flattenObject()', function() {
+    it('should merge nested objects to the root.', function() {
+      var file = {a: 'a', b: {c: 'd'}};
+      var o = utils.flattenObject(file, 'b');
+
+      o.should.have.property('a');
+      o.should.have.property('c');
+    });
+
+    it('should merge nested objects to the root.', function() {
+      var file = {a: 'a', b: {c: 'd', e: 'f'}};
+      var o = utils.flattenObject(file, 'b');
+
+      o.should.have.property('a');
+      o.should.have.property('c');
+      o.should.have.property('e');
+      o.should.not.have.property('b');
+    });
+  });
+
+
+  describe('.siftKeys()', function() {
+    it('should merge default data properties in the given object.', function() {
+      var file = {
+        foo: 'bar',
+        content: 'AAA',
+        data: {x: 'x'},
+        locals: {y: 'y', z: 'z'}
+      };
+      var o = utils.siftKeys(file);
+
+      // root
+      o.should.have.property('data');
+      o.should.have.property('locals');
+      o.should.not.have.property('foo');
+
+      // data
+      o.data.should.have.property('x');
+
+      // orig
+      o.orig.should.have.property('content');
+      o.orig.should.have.property('foo');
+    });
+  });
+
   describe('.extendFile()', function() {
     it('should merge default data properties in the given object.', function() {
       var file = {data: {x: 'x'}};
@@ -23,9 +80,10 @@ describe('parsers utils', function() {
       var o = utils.extendFile(file, opts);
 
       o.should.have.property('data');
+      o.should.have.property('locals');
       o.data.should.have.property('x');
-      o.data.should.have.property('y');
-      o.data.should.have.property('z');
+      o.locals.should.have.property('y');
+      o.locals.should.have.property('z');
     });
 
     it('should return an object with data and content properties.', function() {
@@ -82,14 +140,15 @@ describe('parsers utils', function() {
 
     it('should move properties other than `data` and `content` over to `orig`', function() {
       var o = utils.extendFile({content: '---\ntitle: foo\n---\n'}, {a: 'a', b: 'b', c: 'c'});
+
       o.should.have.property('data');
       o.should.have.property('content');
       o.should.not.have.property('a');
       o.should.not.have.property('b');
       o.should.not.have.property('c');
-      o.data.should.have.property('a');
-      o.data.should.have.property('b');
-      o.data.should.have.property('c');
+      o.locals.should.have.property('a');
+      o.locals.should.have.property('b');
+      o.locals.should.have.property('c');
     });
 
     it('should move properties other than `data` and `content` over to `orig`', function() {
@@ -106,7 +165,6 @@ describe('parsers utils', function() {
   });
 
   describe('multiple passes', function() {
-
     it('should add an empty `content` property', function() {
       var file_a = matter('---\ntitle: foo\n---\nThis is content');
       var a = utils.extendFile(file_a, {data: {x: 'x'}});
@@ -125,67 +183,6 @@ describe('parsers utils', function() {
       // b.orig.content.should.equal(content);
       c.orig.content.should.equal(content);
     });
-
   });
 
-  describe('.mergeData()', function() {
-    it('should merge default data properties in the given object.', function() {
-      var data = {
-        data: {x: 'x'},
-        locals: {y: 'y', z: 'z'},
-        foo: {a: 'a'}
-      };
-
-      var o = utils.mergeData(data);
-      o.should.have.property('x');
-      o.should.have.property('y');
-      o.should.have.property('z');
-      o.should.not.have.property('a');
-    });
-
-    it('should merge default and custom data properties in the given object.', function() {
-      var data = {
-        data: {x: 'x'},
-        locals: {y: 'y', z: 'z'},
-        foo: {a: 'a'}
-      };
-
-      var o = utils.mergeData(data, ['foo', 'data', 'locals']);
-      o.should.have.property('x');
-      o.should.have.property('y');
-      o.should.have.property('z');
-      o.should.have.property('a');
-    });
-
-    it('should merge data in the given order.', function() {
-      var one = {
-        data: {a: 'a'},
-        locals: {a: 'b'},
-        foo: {a: 'c'}
-      };
-
-      var a = utils.mergeData(one, ['foo']);
-      a.should.have.property('a');
-      a.a.should.equal('c');
-
-      var b = utils.mergeData(one, ['foo', 'data', 'locals']);
-      b.should.have.property('a');
-      b.a.should.equal('b');
-    });
-
-    it('should give preference to the object passed as a second param.', function() {
-      var one = {
-        data: {a: 'a'},
-        locals: {a: 'b'},
-        foo: {a: 'c'}
-      };
-
-      var a = utils.mergeData(one, {a: 'bbb'}, ['foo']);
-      a.a.should.equal('bbb');
-
-      var b = utils.mergeData(one, ['foo', 'data', 'locals']);
-      b.should.have.property('a');
-      b.a.should.equal('b');
-    });
-  });
 });
