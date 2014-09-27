@@ -247,7 +247,6 @@ Parsers.prototype.parseSync = function(file, stack, options) {
  * is passed, the entire parsers is returned.
  *
  * ```js
- * parser.set('md', function() {});
  * parser.get('md')
  * // => [function]
  * ```
@@ -275,19 +274,19 @@ Parsers.prototype.get = function(ext) {
 /**
  * Remove the parser stack for the given `ext`, or
  * if no value is specified the entire parsers object
- * is reset.
+ * is clear.
  *
  * **Example:**
  *
  * ```js
- * parsers.reset()
+ * parsers.clear()
  * ```
  *
  * @param {String} `ext` The stack to remove.
  * @api public
  */
 
-Parsers.prototype.reset = function(ext) {
+Parsers.prototype.clear = function(ext) {
   if (ext) {
     if (ext[0] !== '.') {
       ext = '.' + ext;
