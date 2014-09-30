@@ -18,7 +18,7 @@ describe('parsers utils', function() {
   describe('.extendFile()', function() {
     it('should merge default data properties in the given object.', function() {
       var file = {data: {x: 'x'}};
-      var opts = {locals: {y: 'y', z: 'z'}};
+      var opts = {data: {y: 'y', z: 'z'}};
 
       var o = utils.extendFile(file, opts);
 
@@ -87,9 +87,9 @@ describe('parsers utils', function() {
       o.should.not.have.property('a');
       o.should.not.have.property('b');
       o.should.not.have.property('c');
-      o.data.should.have.property('a');
-      o.data.should.have.property('b');
-      o.data.should.have.property('c');
+      o.locals.should.have.property('a');
+      o.locals.should.have.property('b');
+      o.locals.should.have.property('c');
     });
 
     it('should move properties other than `data` and `content` over to `orig`', function() {
@@ -128,7 +128,7 @@ describe('parsers utils', function() {
 
   });
 
-  describe('.mergeData()', function() {
+  xdescribe('.mergeData()', function() {
     it('should merge default data properties in the given object.', function() {
       var data = {
         data: {x: 'x'},
