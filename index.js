@@ -272,6 +272,7 @@ Parsers.prototype.parseStream = function(stack, options) {
   args[1] = args[1].map(function (parser) {
     return parser.parseStream;
   });
+
   args.shift();
 
   return parsers.pipeline.apply(this, args);
