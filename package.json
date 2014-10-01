@@ -49,6 +49,7 @@
     "test": "mocha -R spec"
   },
   "devDependencies": {
+    "event-stream": "^3.1.7",
     "gray-matter": "^0.4.2",
     "lodash": "^2.4.1",
     "mocha": "*",
