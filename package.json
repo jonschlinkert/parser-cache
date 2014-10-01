@@ -1,7 +1,7 @@
 {
   "name": "parser-cache",
   "description": "Cache and load parsers, similiar to consolidate.js engines.",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "homepage": "https://github.com/jonschlinkert/parser-cache",
   "author": {
     "name": "Jon Schlinkert",
@@ -49,6 +49,7 @@
     "test": "mocha -R spec"
   },
   "devDependencies": {
+    "event-stream": "^3.1.7",
     "gray-matter": "^0.4.2",
     "lodash": "^2.4.1",
     "mocha": "*",
