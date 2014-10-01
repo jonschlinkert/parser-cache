@@ -131,7 +131,7 @@ describe('parsers defaults', function () {
       file.should.have.property('orig');
 
       file.data.should.eql({title: 'Front Matter'});
-      file.content.should.eql('\nThis is content.');
+      file.content.should.eql('This is content.');
       this.emit('data', file);
     }, function () {
       this.emit('end');

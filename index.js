@@ -269,7 +269,7 @@ Parsers.prototype.parseStream = function(stack, options) {
   var args = this._parse.call(this, null, stack, options);
   var parsers = new Plugins();
 
-  args[1] = _.map(args[1], function (parser) {
+  args[1] = args[1].map(function (parser) {
     return parser.parseStream;
   });
   args.shift();
