@@ -10,6 +10,7 @@
 var should = require('should');
 var matter = require('gray-matter');
 var utils = require('parser-utils');
+var es = require('event-stream');
 var _ = require('lodash');
 
 var Parsers = require('..');
@@ -30,7 +31,12 @@ describe('parsers defaults', function () {
         file = utils.extendFile(file);
         _.merge(file, matter(file.content));
         return file;
-      }
+      },
+      parseStream: es.through(function (file) {
+        file = utils.extendFile(file);
+        _.merge(file, matter(file.content));
+        this.emit('data', file);
+      })
     });
   });
 
@@ -108,4 +114,32 @@ describe('parsers defaults', function () {
       done();
     });
   });
+
+  it('should parse content with the given parser through the stream.', function (done) {
+    var matter = parsers.get('md');
+
+    var fixture = '---\ntitle: Front Matter\n---\nThis is content.';
+
+    var pipeline = parsers.parseStream(matter);
+    var input = es.through();
+
+    var output = es.through(function (file) {
+      file.should.be.an.object;
+      file.should.have.property('path');
+      file.should.have.property('data');
+      file.should.have.property('content');
+      file.should.have.property('orig');
+
+      file.data.should.eql({title: 'Front Matter'});
+      file.content.should.eql('\nThis is content.');
+      this.emit('data', file);
+    }, function () {
+      this.emit('end');
+    });
+
+    output.on('end', done);
+    input.pipe(pipeline).pipe(output);
+    input.write(fixture);
+    input.end();
+  })
 });

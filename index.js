@@ -153,7 +153,7 @@ Parsers.prototype._parse = function(file, stack, options) {
     args[1] = null;
   }
 
-  var ext = args[0].ext || options && options.ext;
+  var ext = (args[0] && args[0].ext) || (options && options.ext);
   if (!ext) {
     ext = '*';
   }
@@ -239,6 +239,42 @@ Parsers.prototype.parseSync = function(file, stack, options) {
   });
 
   return parsers.run.apply(this, args);
+};
+
+
+/**
+ * Run a stack of **stream** parsers for input `files`.
+ *
+ * ```js
+ * gulp.src('path/to/files/*.md')
+ *   .pipe(template.parseStream({ext: '.md'}))
+ *   .pipe(gulp.dest('dist'));
+ * ```
+ *
+ * Or, explicitly pass an array of parser functions as a section argument.
+ *
+ * ```js
+ * gulp.src('path/to/files/*.md')
+ *   .pipe(template.parseStream([a, b, c], {ext: '.md'}))
+ *   .pipe(gulp.dest('dist'));
+ * ```
+ *
+ * @param  {Array} `stack` Optionally pass an array of functions to use as parsers.
+ * @param  {Object} `options`
+ * @return {Stream} Stream pipeline used to parse files in a stream.
+ * @api public
+ */
+
+Parsers.prototype.parseStream = function(stack, options) {
+  var args = this._parse.call(this, null, stack, options);
+  var parsers = new Plugins();
+
+  args[1] = _.map(args[1], function (parser) {
+    return parser.parseStream;
+  });
+  args.shift();
+
+  return parsers.pipeline.apply(this, args);
 };
 
 
