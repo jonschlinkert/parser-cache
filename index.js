@@ -88,53 +88,6 @@ Parsers.prototype.register = function(ext, fn) {
 };
 
 
-
-/**
- * Register the given parser callback `fn` as `ext`. If `ext`
- * is not given, the parser `fn` will be pushed into the
- * default parser stack.
- *
- * ```js
- * // Default stack
- * parsers.register(require('parser-front-matter'));
- *
- * // Associated with `.hbs` file extension
- * parsers.register('hbs', require('parser-front-matter'));
- * ```
- *
- * @param {String} `ext`
- * @param {Function|Object} `fn` or `options`
- * @return {Object} `parsers` to enable chaining.
- * @api public
- */
-
-Parsers.prototype.registerSync = function(ext, fn) {
-  if (typeof ext !== 'string') {
-    fn = ext;
-    ext = '*';
-  }
-
-  if (ext[0] !== '.') {
-    ext = '.' + ext;
-  }
-
-  if (!this.parsers[ext]) {
-    this.parsers[ext] = [];
-  }
-
-  var parser = {};
-
-  if (typeof fn === 'function') {
-    parser.parseSync = fn;
-  } else {
-    parser = fn;
-  }
-
-  this.parsers[ext].push(parser);
-  return this;
-};
-
-
 /**
  * Private method for registering parsers.
  *
@@ -285,7 +238,7 @@ Parsers.prototype.parseStream = function(stack, options) {
  *
  * ```js
  * parser.get('md')
- * // => [function]
+ * // => { parse[function]}
  * ```
  *
  * @method get
