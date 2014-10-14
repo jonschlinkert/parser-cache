@@ -3,7 +3,6 @@
 
 var Plugins = require('plugins');
 
-
 /**
  * ```js
  * var Parsers = require('parser-cache');
@@ -61,9 +60,9 @@ Parsers.prototype.defaultParsers = function() {
  * @api public
  */
 
-Parsers.prototype._register = function(ext, fn, sync) {
+Parsers.prototype.register = function(ext, fn, type) {
   if (typeof ext !== 'string') {
-    sync = fn;
+    type = fn;
     fn = ext;
     ext = '*';
   }
@@ -79,70 +78,10 @@ Parsers.prototype._register = function(ext, fn, sync) {
   var parser = {};
 
   if (typeof fn === 'function') {
-    if (sync) {
-      parser.parseSync = fn;
-    } else {
-      parser.parse = fn;
-    }
+    parser.parse = fn;
   } else {
     parser = fn;
   }
-
-  this.parsers[ext].push(parser);
-  return this;
-};
-
-Parsers.prototype.register = function(ext, fn) {
-  return this._register(ext, fn);
-};
-
-Parsers.prototype.registerSync = function(ext, fn) {
-  return this._register(ext, fn, true);
-};
-
-
-
-/**
- * Register the given parser callback `fn` as `ext`. If `ext`
- * is not given, the parser `fn` will be pushed into the
- * default parser stack.
- *
- * ```js
- * // Default stack
- * parsers.register(require('parser-front-matter'));
- *
- * // Associated with `.hbs` file extension
- * parsers.register('hbs', require('parser-front-matter'));
- * ```
- *
- * @param {String} `ext`
- * @param {Function|Object} `fn` or `options`
- * @return {Object} `parsers` to enable chaining.
- * @api public
- */
-
-Parsers.prototype.registerSync = function(ext, fn) {
-  if (typeof ext !== 'string') {
-    fn = ext;
-    ext = '*';
-  }
-
-  if (ext[0] !== '.') {
-    ext = '.' + ext;
-  }
-
-  if (!this.parsers[ext]) {
-    this.parsers[ext] = [];
-  }
-
-  var parser = {};
-
-  if (typeof fn === 'function') {
-    parser.parseSync = fn;
-  } else {
-    parser = fn;
-  }
-
   this.parsers[ext].push(parser);
   return this;
 };
