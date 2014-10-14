@@ -3,7 +3,6 @@
 
 var Plugins = require('plugins');
 
-
 /**
  * ```js
  * var Parsers = require('parser-cache');
@@ -61,8 +60,9 @@ Parsers.prototype.defaultParsers = function() {
  * @api public
  */
 
-Parsers.prototype.register = function(ext, fn) {
+Parsers.prototype.register = function(ext, fn, type) {
   if (typeof ext !== 'string') {
+    type = fn;
     fn = ext;
     ext = '*';
   }
@@ -82,7 +82,6 @@ Parsers.prototype.register = function(ext, fn) {
   } else {
     parser = fn;
   }
-
   this.parsers[ext].push(parser);
   return this;
 };
