@@ -2,6 +2,7 @@
 
 
 var Plugins = require('plugins');
+var isObject = require('isobject');
 
 /**
  * ```js
@@ -47,11 +48,11 @@ Parsers.prototype.defaultParsers = function() {
  * default parser stack.
  *
  * ```js
- * // Default stack
+ * // Push the parser into the default stack
  * parsers.register(require('parser-front-matter'));
  *
- * // Associated with `.hbs` file extension
- * parsers.register('hbs', require('parser-front-matter'));
+ * // Or push the parser into the `foo` stack
+ * parsers.register('foo', require('parser-front-matter'));
  * ```
  *
  * @param {String} `ext`
@@ -60,9 +61,9 @@ Parsers.prototype.defaultParsers = function() {
  * @api public
  */
 
-Parsers.prototype.register = function(ext, fn, type) {
+Parsers.prototype.register = function(ext, fn, opts) {
   if (typeof ext !== 'string') {
-    type = fn;
+    opts = fn;
     fn = ext;
     ext = '*';
   }
@@ -82,6 +83,11 @@ Parsers.prototype.register = function(ext, fn, type) {
   } else {
     parser = fn;
   }
+
+  if (opts && isObject(opts)) {
+    parser.options = opts;
+  }
+
   this.parsers[ext].push(parser);
   return this;
 };
@@ -126,7 +132,7 @@ Parsers.prototype._parse = function(file, stack, options) {
  *
  * ```js
  * var str = fs.readFileSync('some-file.md', 'utf8');
- * template.parse({ext: '.md', content: str}, function (err, file) {
+ * parsers.parse({ext: '.md', content: str}, function (err, file) {
  *   console.log(file);
  * });
  * ```
@@ -134,7 +140,7 @@ Parsers.prototype._parse = function(file, stack, options) {
  * Or, explicitly pass an array of parser functions as a section argument.
  *
  * ```js
- * template.parse(file, [a, b, c], function (err, file) {
+ * parsers.parse(file, [a, b, c], function (err, file) {
  *   console.log(file);
  * });
  * ```
@@ -166,13 +172,13 @@ Parsers.prototype.parse = function(file, stack, options) {
  *
  * ```js
  * var str = fs.readFileSync('some-file.md', 'utf8');
- * template.parseSync({ext: '.md', content: str});
+ * parsers.parseSync({ext: '.md', content: str});
  * ```
  *
  * Or, explicitly pass an array of parser functions as a section argument.
  *
  * ```js
- * template.parseSync(file, [a, b, c]);
+ * parsers.parseSync(file, [a, b, c]);
  * ```
  *
  * @param  {Object|String} `file` Either a string or an object.
@@ -199,7 +205,7 @@ Parsers.prototype.parseSync = function(file, stack, options) {
  *
  * ```js
  * gulp.src('path/to/files/*.md')
- *   .pipe(template.parseStream({ext: '.md'}))
+ *   .pipe(parsers.parseStream({ext: '.md'}))
  *   .pipe(gulp.dest('dist'));
  * ```
  *
@@ -207,7 +213,7 @@ Parsers.prototype.parseSync = function(file, stack, options) {
  *
  * ```js
  * gulp.src('path/to/files/*.md')
- *   .pipe(template.parseStream([a, b, c], {ext: '.md'}))
+ *   .pipe(parsers.parseStream([a, b, c], {ext: '.md'}))
  *   .pipe(gulp.dest('dist'));
  * ```
  *
@@ -286,5 +292,11 @@ Parsers.prototype.clear = function(ext) {
   }
 };
 
+
+/**
+ * Export `Parsers`
+ *
+ * @type {Object}
+ */
 
 module.exports = Parsers;

@@ -16,7 +16,7 @@ var parsers = require('parser-cache');
 ```
 
 ## API
-### [Parsers](index.js#L16)
+### [Parsers](index.js#L17)
 
 * `options` **{Object}**: Default options to use.    
 
@@ -25,7 +25,7 @@ var Parsers = require('parser-cache');
 var parsers = new Parsers();
 ```
 
-### [.register](index.js#L63)
+### [.register](index.js#L64)
 
 Register the given parser callback `fn` as `ext`. If `ext` is not given, the parser `fn` will be pushed into the default parser stack.
 
@@ -34,14 +34,14 @@ Register the given parser callback `fn` as `ext`. If `ext` is not given, the par
 * `returns` **{Object}** `parsers`: to enable chaining.  
 
 ```js
-// Default stack
+// Push the parser into the default stack
 parsers.register(require('parser-front-matter'));
 
-// Associated with `.hbs` file extension
-parsers.register('hbs', require('parser-front-matter'));
+// Or push the parser into the `foo` stack
+parsers.register('foo', require('parser-front-matter'));
 ```
 
-### [.parse](index.js#L149)
+### [.parse](index.js#L155)
 
 Run a stack of **async** parsers for the given `file`. If `file` is an object with an `ext` property, then `ext` is used to get the parser stack. If `ext` doesn't have a stack, the default `noop` parser will be used.
 
@@ -52,7 +52,7 @@ Run a stack of **async** parsers for the given `file`. If `file` is an object wi
 
 ```js
 var str = fs.readFileSync('some-file.md', 'utf8');
-template.parse({ext: '.md', content: str}, function (err, file) {
+parsers.parse({ext: '.md', content: str}, function (err, file) {
   console.log(file);
 });
 ```
@@ -60,12 +60,12 @@ template.parse({ext: '.md', content: str}, function (err, file) {
 Or, explicitly pass an array of parser functions as a section argument.
 
 ```js
-template.parse(file, [a, b, c], function (err, file) {
+parsers.parse(file, [a, b, c], function (err, file) {
   console.log(file);
 });
 ```
 
-### [.parseSync](index.js#L185)
+### [.parseSync](index.js#L191)
 
 Run a stack of **sync** parsers for the given `file`. If `file` is an object with an `ext` property, then `ext` is used to get the parser stack. If `ext` doesn't have a stack, the default `noop` parser will be used.
 
@@ -76,16 +76,16 @@ Run a stack of **sync** parsers for the given `file`. If `file` is an object wit
 
 ```js
 var str = fs.readFileSync('some-file.md', 'utf8');
-template.parseSync({ext: '.md', content: str});
+parsers.parseSync({ext: '.md', content: str});
 ```
 
 Or, explicitly pass an array of parser functions as a section argument.
 
 ```js
-template.parseSync(file, [a, b, c]);
+parsers.parseSync(file, [a, b, c]);
 ```
 
-### [.parseStream](index.js#L220)
+### [.parseStream](index.js#L226)
 
 Run a stack of **stream** parsers for input `files`.
 
@@ -95,7 +95,7 @@ Run a stack of **stream** parsers for input `files`.
 
 ```js
 gulp.src('path/to/files/*.md')
-  .pipe(template.parseStream({ext: '.md'}))
+  .pipe(parsers.parseStream({ext: '.md'}))
   .pipe(gulp.dest('dist'));
 ```
 
@@ -103,11 +103,11 @@ Or, explicitly pass an array of parser functions as a section argument.
 
 ```js
 gulp.src('path/to/files/*.md')
-  .pipe(template.parseStream([a, b, c], {ext: '.md'}))
+  .pipe(parsers.parseStream([a, b, c], {ext: '.md'}))
   .pipe(gulp.dest('dist'));
 ```
 
-### [.get](index.js#L249)
+### [.get](index.js#L255)
 
 Return the parser stored by `ext`. If no `ext` is passed, the entire parsers is returned.
 
@@ -119,7 +119,7 @@ parser.get('md')
 // => { parse[function]}
 ```
 
-### [.clear](index.js#L278)
+### [.clear](index.js#L284)
 
 Remove the parser stack for the given `ext`, or if no value is specified the entire parsers object is clear.
 
