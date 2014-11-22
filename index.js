@@ -137,7 +137,7 @@ Parsers.prototype._parse = function(file, stack, options) {
  * });
  * ```
  *
- * Or, explicitly pass an array of parser functions as a section argument.
+ * Or, explicitly pass an array of parser functions as a second argument.
  *
  * ```js
  * parsers.parse(file, [a, b, c], function (err, file) {
@@ -175,7 +175,7 @@ Parsers.prototype.parse = function(file, stack, options) {
  * parsers.parseSync({ext: '.md', content: str});
  * ```
  *
- * Or, explicitly pass an array of parser functions as a section argument.
+ * Or, explicitly pass an array of parser functions as a second argument.
  *
  * ```js
  * parsers.parseSync(file, [a, b, c]);
@@ -209,7 +209,7 @@ Parsers.prototype.parseSync = function(file, stack, options) {
  *   .pipe(gulp.dest('dist'));
  * ```
  *
- * Or, explicitly pass an array of parser functions as a section argument.
+ * Or, explicitly pass an array of parser functions as a second argument.
  *
  * ```js
  * gulp.src('path/to/files/*.md')
